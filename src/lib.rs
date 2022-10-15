@@ -38,6 +38,7 @@ impl Plugin for GamePlugin {
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(PlayerPlugin);
+            .add_plugin(MeshPlugin);
 
         #[cfg(debug_assertions)]
         {
