@@ -5,8 +5,6 @@ use bevy::prelude::*;
 
 pub struct MeshPlugin;
 
-#[derive(Component)]
-
 impl Plugin for MeshPlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(setup));
@@ -15,11 +13,11 @@ impl Plugin for MeshPlugin {
 
 fn create_triangle() -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.set_attribute(
+    mesh.insert_attribute(
         Mesh::ATTRIBUTE_POSITION,
         vec![[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]],
     );
-    mesh.set_attribute(Mesh::ATTRIBUTE_COLOR, vec![[0.0, 0.0, 0.0, 1.0]; 3]);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, vec![[0.0, 0.0, 0.0, 1.0]; 3]);
     mesh.set_indices(Some(Indices::U32(vec![0, 1, 2])));
     mesh
 }

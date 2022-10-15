@@ -2,6 +2,7 @@ mod actions;
 mod audio;
 mod loading;
 mod menu;
+mod mesh;
 mod player;
 
 use crate::actions::ActionsPlugin;
@@ -14,6 +15,7 @@ use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use mesh::MeshPlugin;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -37,7 +39,7 @@ impl Plugin for GamePlugin {
             .add_plugin(MenuPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
-            .add_plugin(PlayerPlugin);
+            .add_plugin(PlayerPlugin)
             .add_plugin(MeshPlugin);
 
         #[cfg(debug_assertions)]
