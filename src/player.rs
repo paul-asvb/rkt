@@ -35,7 +35,7 @@ fn move_player(
     if actions.player_movement.is_none() {
         return;
     }
-    let speed = 150.;
+    let speed = 1000.;
     let movement = Vec3::new(
         actions.player_movement.unwrap().x * speed * time.delta_seconds(),
         actions.player_movement.unwrap().y * speed * time.delta_seconds(),
