@@ -5,15 +5,18 @@ mod menu;
 mod player;
 mod snake;
 
-use crate::actions::ActionsPlugin;
-use crate::audio::InternalAudioPlugin;
-use crate::loading::LoadingPlugin;
-use crate::menu::MenuPlugin;
+pub const TIME_STEP: f32 = 1.0 / 60.0;
 
-use bevy::app::App;
+use crate::actions::ActionsPlugin;
+// use crate::audio::InternalAudioPlugin;
+// use crate::loading::LoadingPlugin;
+// use crate::menu::MenuPlugin;
+
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use bevy::{app::App, time::FixedTimestep};
+use bevy_prototype_debug_lines::DebugLinesPlugin;
 use snake::SnakePlugin;
 
 // This example game uses States to separate logic
@@ -38,14 +41,19 @@ impl Plugin for GamePlugin {
         //     .add_plugin(MenuPlugin)
         //     .add_plugin(ActionsPlugin)
         //     .add_plugin(InternalAudioPlugin)
-        app.add_state(GameState::Playing)
-            .add_plugin(ActionsPlugin)
-            .add_plugin(SnakePlugin);
+        app.add_system_set(
+            SystemSet::new().with_run_criteria(FixedTimestep::step(TIME_STEP as f64)),
+        )
+        .add_state(GameState::Playing)
+        .add_plugin(ActionsPlugin)
+        .add_plugin(SnakePlugin);
 
         #[cfg(debug_assertions)]
         {
-            app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-                .add_plugin(LogDiagnosticsPlugin::default());
+            app
+                //.add_plugin(FrameTimeDiagnosticsPlugin::default())
+                //  .add_plugin(LogDiagnosticsPlugin::default())
+                .add_plugin(DebugLinesPlugin::default());
         }
     }
 }
