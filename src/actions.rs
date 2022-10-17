@@ -1,5 +1,7 @@
 use crate::GameState;
-use bevy::prelude::*;
+use bevy::{prelude::*, math::vec2};
+
+use rand::Rng; // 0.6.5
 
 pub struct ActionsPlugin;
 
@@ -13,71 +15,64 @@ impl Plugin for ActionsPlugin {
     }
 }
 
+// points in the direction the player is moving
 #[derive(Default)]
 pub struct Actions {
-    pub player_movement: Option<Vec2>,
+    pub direction: Vec2,
 }
 
 fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
-    if GameControl::Up.just_released(&keyboard_input)
-        || GameControl::Up.pressed(&keyboard_input)
-        || GameControl::Left.just_released(&keyboard_input)
-        || GameControl::Left.pressed(&keyboard_input)
-        || GameControl::Down.just_released(&keyboard_input)
-        || GameControl::Down.pressed(&keyboard_input)
-        || GameControl::Right.just_released(&keyboard_input)
-        || GameControl::Right.pressed(&keyboard_input)
-    {
-        let mut player_movement = Vec2::ZERO;
+    
+    let mut rng = rand::thread_rng();
 
-        if GameControl::Up.just_released(&keyboard_input)
-            || GameControl::Down.just_released(&keyboard_input)
-        {
-            if GameControl::Up.pressed(&keyboard_input) {
-                player_movement.y = 1.;
-            } else if GameControl::Down.pressed(&keyboard_input) {
-                player_movement.y = -1.;
-            } else {
-                player_movement.y = 0.;
-            }
-        } else if GameControl::Up.just_pressed(&keyboard_input) {
-            player_movement.y = 1.;
-        } else if GameControl::Down.just_pressed(&keyboard_input) {
-            player_movement.y = -1.;
-        } else {
-            player_movement.y = actions.player_movement.unwrap_or(Vec2::ZERO).y;
-        }
+        let mut player_movement = vec2(rng.gen::<f32>(),rng.gen::<f32>());
 
-        if GameControl::Right.just_released(&keyboard_input)
-            || GameControl::Left.just_released(&keyboard_input)
-        {
-            if GameControl::Right.pressed(&keyboard_input) {
-                player_movement.x = 1.;
-            } else if GameControl::Left.pressed(&keyboard_input) {
-                player_movement.x = -1.;
-            } else {
-                player_movement.x = 0.;
-            }
-        } else if GameControl::Right.just_pressed(&keyboard_input) {
-            player_movement.x = 1.;
-        } else if GameControl::Left.just_pressed(&keyboard_input) {
-            player_movement.x = -1.;
-        } else {
-            player_movement.x = actions.player_movement.unwrap_or(Vec2::ZERO).x;
-        }
+        actions.direction = player_movement;
 
-        if player_movement != Vec2::ZERO {
-            player_movement = player_movement.normalize();
-            actions.player_movement = Some(player_movement);
-        }
-    } else {
-        actions.player_movement = None;
-    }
+        // if GameControl::Up.just_released(&keyboard_input)
+        //     || GameControl::Down.just_released(&keyboard_input)
+        // {
+        //     if GameControl::Up.pressed(&keyboard_input) {
+        //         player_movement.y = 1.;
+        //     } else if GameControl::Down.pressed(&keyboard_input) {
+        //         player_movement.y = -1.;
+        //     } else {
+        //         player_movement.y = 0.;
+        //     }
+        // } else if GameControl::Up.just_pressed(&keyboard_input) {
+        //     player_movement.y = 1.;
+        // } else if GameControl::Down.just_pressed(&keyboard_input) {
+        //     player_movement.y = -1.;
+        // } else {
+        //     player_movement.y = actions.player_movement.unwrap_or(Vec2::ZERO).y;
+        // }
+
+        // if GameControl::Right.just_released(&keyboard_input)
+        //     || GameControl::Left.just_released(&keyboard_input)
+        // {
+        //     if GameControl::Right.pressed(&keyboard_input) {
+        //         player_movement.x = 1.;
+        //     } else if GameControl::Left.pressed(&keyboard_input) {
+        //         player_movement.x = -1.;
+        //     } else {
+        //         player_movement.x = 0.;
+        //     }
+        // } else if GameControl::Right.just_pressed(&keyboard_input) {
+        //     player_movement.x = 1.;
+        // } else if GameControl::Left.just_pressed(&keyboard_input) {
+        //     player_movement.x = -1.;
+        // } else {
+        //     player_movement.x = actions.player_movement.unwrap_or(Vec2::ZERO).x;
+        // }
+
+        // if player_movement != Vec2::ZERO {
+        //     player_movement = player_movement.normalize();
+        //     actions.player_movement = Some(player_movement);
+        // }
+   
 }
 
 enum GameControl {
-    Up,
-    Down,
     Left,
     Right,
 }
@@ -85,14 +80,6 @@ enum GameControl {
 impl GameControl {
     fn just_released(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
         match self {
-            GameControl::Up => {
-                keyboard_input.just_released(KeyCode::W)
-                    || keyboard_input.just_released(KeyCode::Up)
-            }
-            GameControl::Down => {
-                keyboard_input.just_released(KeyCode::S)
-                    || keyboard_input.just_released(KeyCode::Down)
-            }
             GameControl::Left => {
                 keyboard_input.just_released(KeyCode::A)
                     || keyboard_input.just_released(KeyCode::Left)
@@ -106,12 +93,6 @@ impl GameControl {
 
     fn pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
         match self {
-            GameControl::Up => {
-                keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up)
-            }
-            GameControl::Down => {
-                keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down)
-            }
             GameControl::Left => {
                 keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left)
             }
@@ -123,13 +104,6 @@ impl GameControl {
 
     fn just_pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
         match self {
-            GameControl::Up => {
-                keyboard_input.just_pressed(KeyCode::W) || keyboard_input.just_pressed(KeyCode::Up)
-            }
-            GameControl::Down => {
-                keyboard_input.just_pressed(KeyCode::S)
-                    || keyboard_input.just_pressed(KeyCode::Down)
-            }
             GameControl::Left => {
                 keyboard_input.just_pressed(KeyCode::A)
                     || keyboard_input.just_pressed(KeyCode::Left)
