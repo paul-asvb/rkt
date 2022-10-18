@@ -2,11 +2,8 @@ use std::f32::MAX;
 
 use crate::actions::Actions;
 use crate::{GameState, TIME_STEP};
-use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
-use bevy::sprite::MaterialMesh2dBundle;
 use bevy_prototype_debug_lines::DebugLines;
-use rand::Rng; // 0.6.5
 
 #[derive(Component)]
 pub struct Snake {
@@ -32,15 +29,15 @@ fn setup(
     commands.spawn_bundle(Camera2dBundle::default());
 
     //commands
-        // .spawn_bundle(MaterialMesh2dBundle {
-        //     mesh: meshes.add(shape::Circle::new(50.).into()).into(),
-        //     material: materials.add(ColorMaterial::from(Color::GREEN)),
-        //     transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
-        //     ..default()
-        // })
-        // .insert(Snake {
-        //     direction: vec3(rng.gen::<f32>(), rng.gen::<f32>(), 0.).normalize(),
-        // });
+    // .spawn_bundle(MaterialMesh2dBundle {
+    //     mesh: meshes.add(shape::Circle::new(50.).into()).into(),
+    //     material: materials.add(ColorMaterial::from(Color::GREEN)),
+    //     transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
+    //     ..default()
+    // })
+    // .insert(Snake {
+    //     direction: vec3(rng.gen::<f32>(), rng.gen::<f32>(), 0.).normalize(),
+    // });
 }
 
 fn moving(
