@@ -3,6 +3,7 @@ use std::f32::MAX;
 use crate::actions::Actions;
 use crate::{GameState, TIME_STEP};
 use bevy::prelude::*;
+use bevy::sprite::MaterialMesh2dBundle;
 use bevy_prototype_debug_lines::DebugLines;
 
 #[derive(Component)]
@@ -28,13 +29,12 @@ fn setup(
 
     commands.spawn_bundle(Camera2dBundle::default());
 
-    //commands
-    // .spawn_bundle(MaterialMesh2dBundle {
-    //     mesh: meshes.add(shape::Circle::new(50.).into()).into(),
-    //     material: materials.add(ColorMaterial::from(Color::GREEN)),
-    //     transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
-    //     ..default()
-    // })
+    commands.spawn_bundle(MaterialMesh2dBundle {
+        mesh: meshes.add(shape::Circle::new(50.).into()).into(),
+        material: materials.add(ColorMaterial::from(Color::GREEN)),
+        transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
+        ..default()
+    });
     // .insert(Snake {
     //     direction: vec3(rng.gen::<f32>(), rng.gen::<f32>(), 0.).normalize(),
     // });
@@ -51,10 +51,10 @@ fn moving(
 
     let start = Vec3::splat(0.0);
 
-    let end = Vec3::new(actions.direction.x * 100.0, actions.direction.y * 100.0, 0.);
+    let end = Vec3::new(1000.0, 1000.0, 10.);
 
     let duration = MAX; // Duration of 0 will show the line for 1 frame.
-    lines.line(start, end, duration);
+    lines.line_colored(start, end, duration, Color::PINK);
 
     let movement = Vec3::new(
         actions.direction.x * speed * TIME_STEP,
