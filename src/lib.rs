@@ -14,6 +14,7 @@ use crate::actions::ActionsPlugin;
 
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::log::LogSettings;
 use bevy::prelude::*;
 use bevy::{app::App, time::FixedTimestep};
 use bevy_prototype_debug_lines::DebugLinesPlugin;
@@ -50,10 +51,13 @@ impl Plugin for GamePlugin {
 
         #[cfg(debug_assertions)]
         {
-            app
-                //.add_plugin(FrameTimeDiagnosticsPlugin::default())
-                //  .add_plugin(LogDiagnosticsPlugin::default())
-                .add_plugin(DebugLinesPlugin::default());
+            app.insert_resource(LogSettings {
+                filter: "info,wgpu_core=warn,wgpu_hal=warn".into(),
+                level: bevy::log::Level::DEBUG,
+            })
+            //.add_plugin(FrameTimeDiagnosticsPlugin::default())
+            //  .add_plugin(LogDiagnosticsPlugin::default())
+            .add_plugin(DebugLinesPlugin::default());
         }
     }
 }

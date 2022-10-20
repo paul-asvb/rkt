@@ -1,5 +1,8 @@
-use crate::{GameState, TIME_STEP};
-use bevy::{math::vec2, prelude::*};
+use bevy::{
+    prelude::{App, Input, KeyCode, Plugin, Res, ResMut, SystemSet, Vec2, debug},
+};
+
+use crate::GameState;
 
 const CURVINESS: f32 = 5.0;
 
@@ -34,7 +37,7 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
 
     let ang = Vec2::from_angle(CURVINESS);
 
-    debug!("x: {}, state: {:?}", ang, actions.direction);
+    debug!("{}",rotation_factor);
 
     actions.direction = actions.direction.rotate(ang);
 }

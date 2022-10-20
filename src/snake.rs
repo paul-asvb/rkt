@@ -53,6 +53,8 @@ fn moving(
 
     let end = Vec3::new(1000.0, 1000.0, 10.);
 
+    debug!("");
+
     let duration = MAX; // Duration of 0 will show the line for 1 frame.
     lines.line_colored(start, end, duration, Color::PINK);
 
