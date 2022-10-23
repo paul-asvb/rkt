@@ -1,10 +1,6 @@
-use bevy::{
-    prelude::{App, Input, KeyCode, Plugin, Res, ResMut, SystemSet, Vec2, debug},
-};
+use bevy::prelude::{debug, App, Input, KeyCode, Plugin, Res, ResMut, SystemSet, Vec2};
 
 use crate::GameState;
-
-const CURVINESS: f32 = 5.0;
 
 pub struct ActionsPlugin;
 
@@ -25,19 +21,19 @@ pub struct Actions {
 }
 
 fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
-    let mut rotation_factor = 10.0;
+    let mut rotation_factor: i8 = 10;
 
     if keyboard_input.pressed(KeyCode::Left) {
-        rotation_factor += 1.0;
+        rotation_factor = rotation_factor * 1;
     }
 
     if keyboard_input.pressed(KeyCode::Right) {
-        rotation_factor -= 1.0;
+        rotation_factor = rotation_factor * -1;
     }
 
-    let ang = Vec2::from_angle(CURVINESS);
-
-    debug!("{}",rotation_factor);
+    let ang = Vec2::from_angle(rotation_factor.into());
 
     actions.direction = actions.direction.rotate(ang);
+
+    println!("{}", actions.direction)
 }
