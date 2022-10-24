@@ -1,6 +1,6 @@
 use std::f32::MAX;
+use std::ops::Mul;
 
-use crate::actions::Actions;
 use crate::{GameState, TIME_STEP};
 use bevy::math::vec3;
 use bevy::prelude::*;
@@ -46,29 +46,34 @@ fn setup(
 fn moving(
     mut lines: ResMut<DebugLines>,
     time: Res<Time>,
-    actions: Res<Actions>,
     mut player_query: Query<&mut Snake>,
+    keyboard_input: Res<Input<KeyCode>>,
 ) {
-    let direction = actions.direction;
     let speed = 100.;
 
-    let start = Vec3::splat(0.0);
+    // let movement = Vec3::new(
+    //     actions.direction.x * speed * TIME_STEP,
+    //     actions.direction.y * speed * TIME_STEP,
+    //     0.,
+    // );
 
-    let end = Vec3::new(1000.0, 1000.0, 10.);
-
-    debug!("");
-
-    let duration = MAX; // Duration of 0 will show the line for 1 frame.
-    lines.line_colored(start, end, duration, Color::PINK);
-
-    let movement = Vec3::new(
-        actions.direction.x * speed * TIME_STEP,
-        actions.direction.y * speed * TIME_STEP,
-        0.,
-    );
-
-
-    for query in &mut player_query {
+    for mut player in &mut player_query {
         //query.direction = query.direction.rotate(ang);
+
+        let old_dir =
+            Vec2::new(player.direction.x, player.direction.y).rotate(Vec2::from_angle(1.0));
+
+        if keyboard_input.pressed(KeyCode::Left) {
+            //rotation_factor = -rotation_factor;
+        }
+
+        if keyboard_input.pressed(KeyCode::Right) {
+            //rotation_factor = rotation_factor * -1;
+        }
+        //,
+
+        player.direction = old_dir.normalize().mul(speed).extend(1.0);
+
+        lines.line_colored(Vec3::splat(0.0), player.direction, MAX, Color::PINK);
     }
 }

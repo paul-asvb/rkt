@@ -1,13 +1,10 @@
-mod actions;
 mod audio;
 mod loading;
 mod menu;
-mod player;
 mod snake;
 
 pub const TIME_STEP: f32 = 1.0 / 60.0;
 
-use crate::actions::ActionsPlugin;
 // use crate::audio::InternalAudioPlugin;
 // use crate::loading::LoadingPlugin;
 // use crate::menu::MenuPlugin;
@@ -46,7 +43,6 @@ impl Plugin for GamePlugin {
             SystemSet::new().with_run_criteria(FixedTimestep::step(TIME_STEP as f64)),
         )
         .add_state(GameState::Playing)
-        .add_plugin(ActionsPlugin)
         .add_plugin(SnakePlugin);
 
         #[cfg(debug_assertions)]
