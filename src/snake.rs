@@ -2,15 +2,17 @@ use std::f32::MAX;
 use std::ops::Mul;
 
 use crate::{GameState, TIME_STEP};
-use bevy::math::vec3;
-use bevy::prelude::*;
+use bevy::math::{vec2, vec3};
 use bevy::sprite::MaterialMesh2dBundle;
+use bevy::window::Windows;
+use bevy::{prelude::*, window};
 use bevy_prototype_debug_lines::DebugLines;
 use rand::Rng;
 
 #[derive(Component)]
 pub struct Snake {
-    direction: Vec3,
+    direction: Vec2,
+    position: Vec2,
 }
 
 pub struct SnakePlugin;
@@ -26,6 +28,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    windows: Res<window::Windows>,
 ) {
     let mut rng = rand::thread_rng();
 
@@ -39,15 +42,19 @@ fn setup(
             ..default()
         })
         .insert(Snake {
-            direction: vec3(rng.gen::<f32>(), rng.gen::<f32>(), 0.).normalize(),
+            direction: vec2(rng.gen::<f32>(), rng.gen::<f32>()).normalize(),
+            position: vec2(
+                rng.gen::<f32>() * windows.get_primary().unwrap().width(),
+                rng.gen::<f32>() * windows.get_primary().unwrap().height(),
+            ),
         });
 }
 
 fn moving(
     mut lines: ResMut<DebugLines>,
-    time: Res<Time>,
     mut player_query: Query<&mut Snake>,
     keyboard_input: Res<Input<KeyCode>>,
+    mut meshes: ResMut<Assets<Mesh>>,
 ) {
     let speed = 100.;
 
@@ -72,8 +79,13 @@ fn moving(
         }
         //,
 
-        player.direction = old_dir.normalize().mul(speed).extend(1.0);
+        player.direction = old_dir.normalize().mul(speed);
 
-        lines.line_colored(Vec3::splat(0.0), player.direction, MAX, Color::PINK);
+        lines.line_colored(
+            Vec3::splat(0.0),
+            player.direction.extend(0.),
+            MAX,
+            Color::PINK,
+        );
     }
 }
