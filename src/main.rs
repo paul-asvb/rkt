@@ -9,6 +9,8 @@ use bevy_game::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
+const TIME_STEP: f32 = 1.0 / 60.0;
+
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 1 })
@@ -20,6 +22,7 @@ fn main() {
             canvas: Some("#bevy".to_owned()),
             ..Default::default()
         })
+        .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
         .add_plugins(DefaultPlugins)
         .add_plugin(GamePlugin)
         .add_startup_system(set_window_icon)

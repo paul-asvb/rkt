@@ -12,7 +12,6 @@ use rand::Rng;
 #[derive(Component)]
 pub struct Snake {
     direction: Vec2,
-    position: Vec2,
 }
 
 pub struct SnakePlugin;
@@ -20,7 +19,7 @@ pub struct SnakePlugin;
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(setup))
-            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(moving));
+            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(move_snake));
     }
 }
 
@@ -36,27 +35,21 @@ fn setup(
 
     commands
         .spawn_bundle(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(50.).into()).into(),
+            mesh: meshes.add(shape::Circle::new(5.).into()).into(),
             material: materials.add(ColorMaterial::from(Color::GREEN)),
             transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
             ..default()
         })
         .insert(Snake {
             direction: vec2(rng.gen::<f32>(), rng.gen::<f32>()).normalize(),
-            position: vec2(
-                rng.gen::<f32>() * windows.get_primary().unwrap().width(),
-                rng.gen::<f32>() * windows.get_primary().unwrap().height(),
-            ),
         });
 }
 
-fn moving(
-    mut lines: ResMut<DebugLines>,
-    mut player_query: Query<&mut Snake>,
+fn move_snake(
     keyboard_input: Res<Input<KeyCode>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    mut player_transform: Query<&mut Transform>,
+    mut player: Query<&mut Snake>,
 ) {
-    let speed = 100.;
 
     // let movement = Vec3::new(
     //     actions.direction.x * speed * TIME_STEP,
@@ -64,28 +57,29 @@ fn moving(
     //     0.,
     // );
 
-    for mut player in &mut player_query {
-        //query.direction = query.direction.rotate(ang);
+    // player position
+    let direction = player.single_mut().direction;
 
-        let old_dir =
-            Vec2::new(player.direction.x, player.direction.y).rotate(Vec2::from_angle(1.0));
 
-        if keyboard_input.pressed(KeyCode::Left) {
-            //rotation_factor = -rotation_factor;
-        }
 
-        if keyboard_input.pressed(KeyCode::Right) {
-            //rotation_factor = rotation_factor * -1;
-        }
-        //,
+    let mut rotation_factor = 1.;
 
-        player.direction = old_dir.normalize().mul(speed);
-
-        lines.line_colored(
-            Vec3::splat(0.0),
-            player.direction.extend(0.),
-            MAX,
-            Color::PINK,
-        );
+    if keyboard_input.pressed(KeyCode::Left) {
+        rotation_factor = -rotation_factor;
     }
+
+    if keyboard_input.pressed(KeyCode::Right) {
+        rotation_factor = rotation_factor;
+    }
+
+    let new_snake_direction =
+        Vec2::new(direction.x, direction.y).rotate(Vec2::from_angle(rotation_factor));
+
+    player.single_mut().direction = new_snake_direction;
+
+    let position = player_transform.single_mut().translation;
+    let new_player_position = vec2(position.x + 1., position.y + 1.);
+    println!("{},{}",new_snake_direction,direction);
+    player_transform.single_mut().translation =
+        (new_player_position + new_snake_direction).extend(1.);
 }
