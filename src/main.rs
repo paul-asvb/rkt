@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use bevy::prelude::{App, ClearColor, Color, Msaa, NonSend, WindowDescriptor};
+use bevy::time::FixedTimestep;
 use bevy::window::WindowId;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
@@ -22,7 +23,6 @@ fn main() {
             canvas: Some("#bevy".to_owned()),
             ..Default::default()
         })
-        .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
         .add_plugins(DefaultPlugins)
         .add_plugin(GamePlugin)
         .add_startup_system(set_window_icon)

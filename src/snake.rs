@@ -10,24 +10,27 @@ use bevy_prototype_debug_lines::DebugLines;
 use rand::Rng;
 
 #[derive(Component)]
-pub struct Snake {
+pub struct Snake;
+
+#[derive(Component)]
+pub struct SelfMoving {
     direction: Vec2,
+    speed: f32,
 }
 
 pub struct SnakePlugin;
 
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(setup))
+        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_snake))
             .add_system_set(SystemSet::on_update(GameState::Playing).with_system(move_snake));
     }
 }
 
-fn setup(
+fn spawn_snake(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    windows: Res<window::Windows>,
 ) {
     let mut rng = rand::thread_rng();
 
@@ -40,17 +43,19 @@ fn setup(
             transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
             ..default()
         })
-        .insert(Snake {
+        .insert(SelfMoving {
             direction: vec2(rng.gen::<f32>(), rng.gen::<f32>()).normalize(),
-        });
+            speed: 8.,
+        })
+        .insert(Snake);
 }
 
 fn move_snake(
     keyboard_input: Res<Input<KeyCode>>,
-    mut player_transform: Query<&mut Transform>,
-    mut player: Query<&mut Snake>,
+    mut query: Query<(&mut SelfMoving, &mut Transform), With<Snake>>,
+    //mut player: Query<&mut Snake>,>,
+    //mut player: Query<&mut Snake>,
 ) {
-
     // let movement = Vec3::new(
     //     actions.direction.x * speed * TIME_STEP,
     //     actions.direction.y * speed * TIME_STEP,
@@ -58,28 +63,29 @@ fn move_snake(
     // );
 
     // player position
-    let direction = player.single_mut().direction;
+    let mut q = query.single_mut();
 
+    let direction = q.0.direction;
+    let speed = q.0.speed;
+    let position = q.1.translation;
 
-
-    let mut rotation_factor = 1.;
+    let mut rotation_factor = 0.;
+    let mut curviness = 0.1;
 
     if keyboard_input.pressed(KeyCode::Left) {
-        rotation_factor = -rotation_factor;
+        rotation_factor += curviness;
     }
 
     if keyboard_input.pressed(KeyCode::Right) {
-        rotation_factor = rotation_factor;
+        rotation_factor -= curviness;
     }
 
-    let new_snake_direction =
-        Vec2::new(direction.x, direction.y).rotate(Vec2::from_angle(rotation_factor));
+    let new_direction = Vec2::new(direction.x, direction.y)
+        .rotate(Vec2::from_angle(rotation_factor))
+        .normalize();
 
-    player.single_mut().direction = new_snake_direction;
+    let new_player_position = vec2(position.x, position.y) + new_direction * speed;
 
-    let position = player_transform.single_mut().translation;
-    let new_player_position = vec2(position.x + 1., position.y + 1.);
-    println!("{},{}",new_snake_direction,direction);
-    player_transform.single_mut().translation =
-        (new_player_position + new_snake_direction).extend(1.);
+    q.0.direction = new_direction;
+    q.1.translation = new_player_position.extend(1.);
 }
