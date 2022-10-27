@@ -8,7 +8,7 @@ trunk serve
 
 ## TODO
 
-- [ ] head movement
+- [x] head movement
 - [ ] tail resource
 - [ ] tail collision
 
