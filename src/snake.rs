@@ -1,12 +1,7 @@
-use std::f32::MAX;
-use std::ops::Mul;
-
-use crate::{GameState, TIME_STEP};
-use bevy::math::{vec2, vec3};
+use crate::GameState;
+use bevy::math::vec2;
+use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
-use bevy::window::Windows;
-use bevy::{prelude::*, window};
-use bevy_prototype_debug_lines::DebugLines;
 use rand::Rng;
 
 #[derive(Component)]
@@ -17,6 +12,15 @@ pub struct SelfMoving {
     direction: Vec2,
     speed: f32,
 }
+
+const SNAKE_SEGMENT_COLOR: Color = Color::rgb(0.3, 0.3, 0.3);
+
+
+#[derive(Component)]
+struct SnakeSegment;
+
+#[derive(Default, Deref, DerefMut)]
+struct SnakeSegments(Vec<Entity>);
 
 pub struct SnakePlugin;
 
@@ -49,6 +53,21 @@ fn spawn_snake(
         })
         .insert(Snake);
 }
+
+// fn spawn_segment(mut commands: Commands, position: Vec2) -> Entity {
+//     commands
+//         .spawn_bundle(SpriteBundle {
+//             sprite: Sprite {
+//                 color: SNAKE_SEGMENT_COLOR,
+//                 ..default()
+//             },
+//             ..default()
+//         })
+//         .insert(SnakeSegment)
+//         .insert(position)
+//         .insert(Size::square(0.65))
+//         .id()
+// }
 
 fn move_snake(
     keyboard_input: Res<Input<KeyCode>>,
