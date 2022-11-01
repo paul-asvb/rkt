@@ -6,12 +6,6 @@ trunk serve
 
 [bevy core concepts](https://github.com/bevyengine/bevy/blob/v0.8.1/examples/ecs/ecs_guide.rs#L9)
 
-## TODO
-
-- [x] head movement
-- [ ] tail resource
-- [ ] tail collision
-
 ## Tutorial
 
 [bevy](https://bevy-cheatbook.github.io/tutorial.html)
