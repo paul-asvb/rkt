@@ -18,6 +18,7 @@ pub struct SelfMoving {
 //const SNAKE_SEGMENT_COLOR: Color = Color::rgb(0.3, 0.3, 0.3);
 const TIMESTEP_PER_SECOND: f32 = 1. / 60.;
 const STARTING_SPEED: f32 = 1.;
+const SNAKE_SIZE: f32 = 5.;
 
 #[derive(Component)]
 struct SnakeSegment;
@@ -26,9 +27,6 @@ struct SnakeSegment;
 struct SnakeSegments(Vec<Entity>);
 
 pub struct SnakePlugin;
-
-#[derive(Component)]
-struct Collider;
 
 #[derive(Default)]
 struct CollisionEvent;
@@ -59,7 +57,7 @@ fn spawn_snake(
 
     commands
         .spawn_bundle(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(5.).into()).into(),
+            mesh: meshes.add(shape::Circle::new(SNAKE_SIZE).into()).into(),
             material: materials.add(ColorMaterial::from(Color::LIME_GREEN)),
             transform: Transform::from_translation(start),
             ..default()
@@ -84,7 +82,7 @@ fn paint_tail(
 
     commands
         .spawn_bundle(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(5.).into()).into(),
+            mesh: meshes.add(shape::Circle::new(SNAKE_SIZE).into()).into(),
             material: materials.add(ColorMaterial::from(Color::GRAY)),
             transform: Transform::from_translation(position.extend(1.)),
             ..default()
@@ -103,7 +101,7 @@ fn move_snake(
     let position = vec2(q.1.translation.x, q.1.translation.y);
 
     let mut rotation_factor = 0.;
-    let curviness = 0.1;
+    let curviness = 0.05;
 
     if keyboard_input.pressed(KeyCode::Left) {
         rotation_factor += curviness;
@@ -124,33 +122,32 @@ fn move_snake(
 }
 
 fn check_for_collisions(
-    mut ball_query: Query<&Transform, With<SnakeHead>>,
-    collider_query: Query<(Entity, &Transform), With<Collider>>,
+    head_query: Query<&Transform, With<SnakeHead>>,
+    tail_query: Query<&Transform, With<SnakeSegment>>,
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
-    let ball_transform = ball_query.single_mut();
-    let ball_size = Vec2 { x: 5., y: 5. };
+    let head_transform = head_query.single();
+
+    const SNAKE_SIZE_VEC: Vec2 = Vec2::new(SNAKE_SIZE, SNAKE_SIZE);
+
+    //let tail_length = tail_query.iter().len();
 
     // check collision with walls
-    for (collider_entity, transform) in &collider_query {
+    for tail_transform in tail_query.iter().take(100) {
+        //print!("{}-",i);
         let collision = collide(
-            ball_transform.translation,
-            ball_size,
-            transform.translation,
-            ball_size,
+            tail_transform.translation,
+            SNAKE_SIZE_VEC,
+            head_transform.translation,
+            SNAKE_SIZE_VEC,
         );
-        println!("{:?}", collision);
-        if let Some(collision) = collision {
+        if let Some(_) = collision {
+            //commands.insert_resource(ClearColor(Color::rgb(255., 0., 0.)));
             // Sends a collision event so that other systems can react to the collision
             collision_events.send_default();
-
-            // only reflect if the ball's velocity is going in the opposite direction of the
-            // collision
-            match collision {
-                _ => {
-                    println!("col")
-                }
-            }
+        } else {
+            // commands.insert_resource(ClearColor(Color::rgb(0., 0., 0.)));
         }
     }
+    // print!("---")
 }
