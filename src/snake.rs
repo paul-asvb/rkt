@@ -28,7 +28,7 @@ struct SnakeSegments(Vec<Entity>);
 
 pub struct SnakePlugin;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct CollisionEvent;
 
 impl Plugin for SnakePlugin {
@@ -40,7 +40,8 @@ impl Plugin for SnakePlugin {
                     .with_system(check_for_collisions)
                     .with_system(move_snake.before(check_for_collisions))
                     .with_system(move_snake)
-                    .with_system(paint_tail)
+                    .with_system(paint_tail.after(check_for_collisions))
+                    .with_system(spawn_tail)
                     .with_run_criteria(FixedTimestep::step(TIMESTEP_PER_SECOND as f64)),
             );
     }
@@ -69,7 +70,7 @@ fn spawn_snake(
         .insert(SnakeHead);
 }
 
-fn paint_tail(
+fn spawn_tail(
     query: Query<(&SelfMoving, &Transform), With<SnakeHead>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -88,6 +89,14 @@ fn paint_tail(
             ..default()
         })
         .insert(SnakeSegment);
+}
+
+fn paint_tail(mut col: EventReader<CollisionEvent>, mut commands: Commands) {
+    if col.iter().next().is_some() {
+        commands.insert_resource(ClearColor(Color::rgb(255., 0., 0.)));
+    } else {
+        commands.insert_resource(ClearColor(Color::rgb(0., 0., 0.)));
+    }
 }
 
 fn move_snake(
@@ -130,11 +139,11 @@ fn check_for_collisions(
 
     const SNAKE_SIZE_VEC: Vec2 = Vec2::new(SNAKE_SIZE, SNAKE_SIZE);
 
-    //let tail_length = tail_query.iter().len();
+    let l = tail_query.iter().len();
 
-    // check collision with walls
-    for tail_transform in tail_query.iter().take(100) {
-        //print!("{}-",i);
+    let taken = if l > 20 { l - 20 } else { 0 };
+
+    for (i, tail_transform) in tail_query.iter().take(taken).enumerate() {
         let collision = collide(
             tail_transform.translation,
             SNAKE_SIZE_VEC,
@@ -142,12 +151,7 @@ fn check_for_collisions(
             SNAKE_SIZE_VEC,
         );
         if let Some(_) = collision {
-            //commands.insert_resource(ClearColor(Color::rgb(255., 0., 0.)));
-            // Sends a collision event so that other systems can react to the collision
-            collision_events.send_default();
-        } else {
-            // commands.insert_resource(ClearColor(Color::rgb(0., 0., 0.)));
+            collision_events.send(CollisionEvent);
         }
     }
-    // print!("---")
 }
