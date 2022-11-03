@@ -28,8 +28,12 @@ struct SnakeSegments(Vec<Entity>);
 
 pub struct SnakePlugin;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 struct CollisionEvent;
+// struct CollisionEvent{
+//     hitter: Entity,
+//     hit: Entity
+// }
 
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
@@ -143,7 +147,7 @@ fn check_for_collisions(
 
     let taken = if l > 20 { l - 20 } else { 0 };
 
-    for (i, tail_transform) in tail_query.iter().take(taken).enumerate() {
+    for tail_transform in tail_query.iter().take(taken) {
         let collision = collide(
             tail_transform.translation,
             SNAKE_SIZE_VEC,

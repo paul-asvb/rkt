@@ -35,6 +35,8 @@ bevy_prototype_debug_lines = "0.8"
 # keep the following in sync with Bevy's dependencies
 winit = { version = "0.26.0", default-features = false }
 image = { version = "0.24", default-features = false }
+ggrs = "0.9.2"
+matchbox_socket = { version = "0.4", features = ["ggrs-socket"] }
 
 [build-dependencies]
 embed-resource = "1.4"

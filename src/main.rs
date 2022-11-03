@@ -10,16 +10,14 @@ use bevy_game::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
-const TIME_STEP: f32 = 1.0 / 60.0;
 
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 1 })
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .insert_resource(WindowDescriptor {
-            width: 800.,
-            height: 600.,
-            title: "Bevy game".to_string(), // ToDo
+            fit_canvas_to_parent: true,
+            title: "RKT".to_string(), // ToDo
             canvas: Some("#bevy".to_owned()),
             ..Default::default()
         })
