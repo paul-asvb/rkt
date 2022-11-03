@@ -38,7 +38,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::Loading)
             .add_plugin(LoadingPlugin)
-            .add_plugin(MenuPlugi)
+            .add_plugin(MenuPlugin)
             .add_system_set(
                 SystemSet::new().with_run_criteria(FixedTimestep::step(TIME_STEP as f64)),
             )
